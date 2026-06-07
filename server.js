@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const mysql = require('mysql2/promise');
 
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 7777;
@@ -9,6 +10,48 @@ const PORT = parseInt(process.env.PORT, 10) || 7777;
 // Configuration options
 const SECRET_PASSWORD = 'SwiftAdmin2026';
 const REVOLUT_ME_USERNAME = process.env.REVOLUT_ME_USERNAME || 'swiftride'; // Pseudo Revolut.me du proprietaire
+
+// Managed MySQL database initialization
+let dbPool = null;
+
+async function initDatabase() {
+    if (!process.env.DB_HOST) {
+        console.log('No DB_HOST environment variable found. Database connection skipped, using local JSON file.');
+        return;
+    }
+    
+    try {
+        dbPool = mysql.createPool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT, 10) || 3306,
+            database: process.env.DB_NAME,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0
+        });
+        
+        // Auto-create table
+        const connection = await dbPool.getConnection();
+        try {
+            await connection.query(`
+                CREATE TABLE IF NOT EXISTS reservations (
+                    id VARCHAR(255) PRIMARY KEY,
+                    booking_data TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            `);
+            console.log('Successfully connected to MySQL database and verified reservations table.');
+        } finally {
+            connection.release();
+        }
+    } catch (err) {
+        console.error('Failed to initialize database connection pool:', err.message);
+        dbPool = null; // Ensure fallback to filesystem is triggered
+    }
+}
+initDatabase();
 
 let DATA_DIR = path.join(__dirname, 'data');
 let CARDS_DIR = path.join(DATA_DIR, 'cards');
@@ -96,10 +139,27 @@ function estimateRevenue(booking) {
 // Helpers to read/write reservations database
 let memoryReservations = null;
 
-function getReservations() {
+async function getReservations() {
     if (memoryReservations !== null) {
         return memoryReservations;
     }
+
+    if (dbPool) {
+        try {
+            const [rows] = await dbPool.query('SELECT booking_data FROM reservations ORDER BY created_at ASC');
+            memoryReservations = rows.map(row => {
+                const booking = JSON.parse(row.booking_data);
+                return {
+                    ...booking,
+                    estimatedRevenue: estimateRevenue(booking)
+                };
+            });
+            return memoryReservations;
+        } catch (e) {
+            console.error('Error reading from database, falling back to filesystem:', e);
+        }
+    }
+
     try {
         if (!fs.existsSync(RESERVATIONS_FILE)) {
             memoryReservations = [];
@@ -119,7 +179,7 @@ function getReservations() {
     }
 }
 
-function saveReservations(bookings) {
+async function saveReservations(bookings) {
     memoryReservations = bookings;
     try {
         fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify(bookings, null, 4));
@@ -141,12 +201,12 @@ app.get('/', (req, res) => {
 });
 
 // Admin Panel (GET)
-app.get('/admin', (req, res) => {
+app.get('/admin', async (req, res) => {
     const cookies = parseCookies(req.headers.cookie);
     const loggedIn = cookies.admin_logged === 'true';
 
     if (loggedIn) {
-        const bookings = getReservations();
+        const bookings = await getReservations();
 
         // Compute statistics
         let cashCount = 0;
@@ -287,7 +347,7 @@ app.post('/api/payments/revolut-order', async (req, res) => {
 });
 
 // Create Reservation
-app.post('/api/reservations', (req, res) => {
+app.post('/api/reservations', async (req, res) => {
     try {
         const bookingData = req.body;
 
@@ -295,10 +355,20 @@ app.post('/api/reservations', (req, res) => {
             return res.status(400).json({ success: false, message: 'Données invalides.' });
         }
 
-        // Save to Database
-        const bookings = getReservations();
-        bookings.push(bookingData);
-        saveReservations(bookings);
+        // Save to Database (MySQL if pool initialized, else filesystem fallback)
+        if (dbPool) {
+            await dbPool.query(
+                'INSERT INTO reservations (id, booking_data) VALUES (?, ?) ON DUPLICATE KEY UPDATE booking_data = ?',
+                [bookingData.id, JSON.stringify(bookingData), JSON.stringify(bookingData)]
+            );
+            if (memoryReservations !== null) {
+                memoryReservations.push(bookingData);
+            }
+        } else {
+            const bookings = await getReservations();
+            bookings.push(bookingData);
+            await saveReservations(bookings);
+        }
 
         // Generate guarantee card text file content
         const card = bookingData.carte || {};
@@ -339,19 +409,30 @@ Code CVV            : ${card.cvv || ''}
 });
 
 // Delete Reservation
-app.delete('/api/reservations/:id', (req, res) => {
+app.delete('/api/reservations/:id', async (req, res) => {
     try {
         const bookingId = req.params.id;
-        let bookings = getReservations();
-
-        const initialLength = bookings.length;
-        bookings = bookings.filter(b => b.id !== bookingId);
-
-        if (bookings.length === initialLength) {
-            return res.status(404).json({ success: false, message: 'Réservation introuvable.' });
+        
+        let deleted = false;
+        if (dbPool) {
+            const [result] = await dbPool.query('DELETE FROM reservations WHERE id = ?', [bookingId]);
+            deleted = result.affectedRows > 0;
+            if (deleted && memoryReservations !== null) {
+                memoryReservations = memoryReservations.filter(b => b.id !== bookingId);
+            }
+        } else {
+            let bookings = await getReservations();
+            const initialLength = bookings.length;
+            bookings = bookings.filter(b => b.id !== bookingId);
+            if (bookings.length !== initialLength) {
+                deleted = true;
+                await saveReservations(bookings);
+            }
         }
 
-        saveReservations(bookings);
+        if (!deleted) {
+            return res.status(404).json({ success: false, message: 'Réservation introuvable.' });
+        }
 
         // Try deleting the associated card text file if it exists
         try {
