@@ -130,6 +130,11 @@ function saveReservations(bookings) {
 
 // ==================== ROUTES ====================
 
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ ok: true });
+});
+
 // Client Homepage
 app.get('/', (req, res) => {
     res.render('index');
