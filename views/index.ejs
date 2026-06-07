@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include('partials/head', { title: "SwiftRide - Chauffeur Privé VTC de Luxe Côte d'Azur | Nice Cannes Monaco", showSEO: true }) %>
+<body>
+
+    <%- include('partials/header') %>
+ 
+    <!-- ==================== HERO SECTION ==================== -->
+    <section id="accueil" class="hero-section" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('/assets/hero_bg.png');">
+        <div class="hero-content-wrapper">
+            <div class="hero-badge">
+                <i class="fa-solid fa-crown gold-text" aria-hidden="true"></i> <span data-i18n="hero-badge">VTC de Prestige sur la Côte d'Azur</span>
+            </div>
+            <h1 class="hero-title" data-i18n="hero-title">Votre Chauffeur Privé VTC de Luxe</h1>
+            <p class="hero-subtitle" data-i18n="hero-subtitle">
+                Au départ de l'<strong>Aéroport de Nice (NCE)</strong>, voyagez dans un confort absolu vers <strong>Monaco, Cannes, Saint-Tropez, Marseille</strong> et toute la France.
+            </p>
+            
+            <div class="hero-features">
+                <span class="hero-feature-item"><i class="fa-solid fa-check gold-text" aria-hidden="true"></i> <span data-i18n="hero-feat-rate">Tarif Fixe Garanti</span></span>
+                <span class="hero-feature-item"><i class="fa-solid fa-check gold-text" aria-hidden="true"></i> <span data-i18n="hero-feat-availability">Disponibilité 24/7</span></span>
+                <span class="hero-feature-item"><i class="fa-solid fa-check gold-text" aria-hidden="true"></i> <span data-i18n="hero-feat-welcome">Accueil Personnalisé</span></span>
+            </div>
+        </div>
+        
+        <div class="hero-scroll-indicator">
+            <a href="#calculateur" aria-label="Défiler vers le bas">
+                <span class="mouse">
+                    <span class="wheel"></span>
+                </span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================== CALCULATOR SECTION ==================== -->
+    <section id="calculateur" class="calculator-section">
+        <div class="container">
+            <div class="section-header text-center reveal-up">
+                <span class="section-tagline" data-i18n="calc-tagline">Tarifs Clairs & Transparents</span>
+                <h2 class="section-title" data-i18n="calc-title">Estimer Votre Trajet Instantanément</h2>
+                <div class="accent-line"></div>
+                <p class="section-desc" data-i18n="calc-desc">
+                    Nous pratiquons un tarif de base de <strong>3.20 € par kilomètre</strong>. Pas de frais cachés, péages et bagages inclus.
+                </p>
+            </div>
+            
+            <div class="calculator-wrapper">
+                <div class="calculator-card glass-panel reveal-left">
+                    <form id="fareCalcForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="calcPickup"><i class="fa-solid fa-plane-departure gold-text" aria-hidden="true"></i> <span data-i18n="calc-label-pickup">Lieu de Départ</span></label>
+                                <div class="input-wrapper disabled">
+                                    <input type="text" id="calcPickup" value="Aéroport de Nice-Côte d'Azur (NCE)" data-i18n-val="calc-val-pickup" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="calcDropoff"><i class="fa-solid fa-location-dot gold-text" aria-hidden="true"></i> <span data-i18n="calc-label-dropoff">Destination</span></label>
+                                <div class="select-wrapper">
+                                    <select id="calcDropoff">
+                                        <option value="cannes" data-i18n="calc-opt-cannes">Cannes (~30 km)</option>
+                                        <option value="monaco" selected data-i18n="calc-opt-monaco">Monaco (~32 km)</option>
+                                        <option value="saint-tropez" data-i18n="calc-opt-sttropez">Saint-Tropez (~110 km)</option>
+                                        <option value="marseille" data-i18n="calc-opt-marseille">Marseille (~185 km)</option>
+                                        <option value="autre" data-i18n="calc-opt-other">Autre destination...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="customDistanceGroup" style="display: none;">
+                            <label for="customDistance"><i class="fa-solid fa-road gold-text" aria-hidden="true"></i> <span data-i18n="calc-label-distance">Estimer la distance (en km)</span></label>
+                            <input type="number" id="customDistance" min="1" max="1000" placeholder="Ex: 50" data-i18n-placeholder="calc-placeholder-distance">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-car-side gold-text" aria-hidden="true"></i> <span data-i18n="calc-label-vehicle">Catégorie de Véhicule</span></label>
+                            <div class="vehicle-radio-group">
+                                <label class="vehicle-radio-option checked">
+                                    <input type="radio" name="calcVehicle" value="business" checked>
+                                    <div class="radio-content">
+                                        <span class="vehicle-name" data-i18n="calc-vehicle-business-title">Berline Affaires</span>
+                                        <span class="vehicle-sub" data-i18n="calc-vehicle-business-sub">Mercedes Classe E ou équivalent (1-3 pers.)</span>
+                                    </div>
+                                </label>
+                                <label class="vehicle-radio-option">
+                                    <input type="radio" name="calcVehicle" value="sedan">
+                                    <div class="radio-content">
+                                        <span class="vehicle-name" data-i18n="calc-vehicle-sedan-title">Berline Premium</span>
+                                        <span class="vehicle-sub" data-i18n="calc-vehicle-sedan-sub">Mercedes Classe S ou équivalent (1-3 pers.)</span>
+                                    </div>
+                                </label>
+                                <label class="vehicle-radio-option">
+                                    <input type="radio" name="calcVehicle" value="van">
+                                    <div class="radio-content">
+                                        <span class="vehicle-name" data-i18n="calc-vehicle-van-title">Grande Berline / Van</span>
+                                        <span class="vehicle-sub" data-i18n="calc-vehicle-van-sub">Mercedes Classe V ou équivalent (1-8 pers.)</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="calc-btn-container">
+                            <button type="button" id="btnCalculate" class="btn btn-primary btn-block">
+                                <i class="fa-solid fa-sliders" aria-hidden="true"></i> <span data-i18n="calc-btn-calculate">Calculer l'estimation</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="calculator-result-card glass-panel reveal-right" id="resultCard">
+                    <div class="result-placeholder" id="resultPlaceholder">
+                        <i class="fa-solid fa-route calculator-icon gold-text animate-pulse" aria-hidden="true"></i>
+                        <h3 data-i18n="res-placeholder-title">Votre Devis Instantané</h3>
+                        <p data-i18n="res-placeholder-desc">Sélectionnez vos options et cliquez sur "Calculer l'estimation" pour afficher le tarif fixe en temps réel.</p>
+                    </div>
+                    
+                    <div class="result-content" id="resultContent" style="display: none;">
+                        <h3 class="result-title" data-i18n="res-title">Détails de Votre Transfert</h3>
+                        
+                        <div class="result-route-info">
+                            <div class="route-point">
+                                <span class="bullet gold"></span>
+                                <div>
+                                    <span class="label" data-i18n="res-label-start">Départ :</span>
+                                    <span class="val font-semibold" data-i18n="res-val-start">Aéroport de Nice (NCE)</span>
+                                </div>
+                            </div>
+                            <div class="route-line-connector"></div>
+                            <div class="route-point">
+                                <span class="bullet black"></span>
+                                <div>
+                                    <span class="label" data-i18n="res-label-end">Destination :</span>
+                                    <span class="val font-semibold" id="resDestination">Monaco</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <ul class="result-details-list">
+                            <li>
+                                <span data-i18n="res-detail-dist">Distance estimée</span>
+                                <strong id="resDistance">32 km</strong>
+                            </li>
+                            <li>
+                                <span data-i18n="res-detail-rate">Tarif de base</span>
+                                <strong>3.20 € / km</strong>
+                            </li>
+                            <li>
+                                <span data-i18n="res-detail-vehicle">Type de véhicule</span>
+                                <strong id="resVehicle">Berline Premium</strong>
+                            </li>
+                            <li>
+                                <span data-i18n="res-detail-service">Frais de service & péages</span>
+                                <strong class="gold-text" data-i18n="res-detail-included">Inclus</strong>
+                            </li>
+                        </ul>
+                        
+                        <div class="result-total-price">
+                            <span class="total-label" data-i18n="res-total-label">Tarif Total Estimé</span>
+                            <div class="price-container">
+                                <span class="price-value" id="resPrice">102.40</span>
+                                <span class="currency">€</span>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="btnBookTransfer" class="btn btn-accent btn-block">
+                            <i class="fa-solid fa-calendar-check" aria-hidden="true"></i> <span data-i18n="res-btn-book">Réserver avec ce tarif</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FLEET SECTION ==================== -->
+    <section id="flotte" class="fleet-section">
+        <div class="container">
+            <div class="section-header text-center reveal-up">
+                <span class="section-tagline" data-i18n="fleet-tagline">Une Flotte d'Exception</span>
+                <h2 class="section-title" data-i18n="fleet-title">Choisissez le Confort Absolu</h2>
+                <div class="accent-line"></div>
+                <p class="section-desc" data-i18n="fleet-desc">
+                    Nos véhicules sont récents, perfectly entretenus et disponibles en coloris prestigieux : <strong>Noir Obsidienne, Blanc Pur et accents dorés</strong>.
+                </p>
+            </div>
+            
+            <div class="fleet-grid">
+                <!-- Vehicle Card 1: Business Sedan -->
+                <div class="vehicle-card glass-panel-hover reveal-left">
+                    <div class="vehicle-img-wrapper">
+                        <img src="/assets/e_class.png" alt="Berline Affaires SwiftRide" class="vehicle-img" width="600" height="360" loading="lazy" decoding="async">
+                        <div class="vehicle-price-badge" data-i18n="fleet-badge">
+                            Dès 3.20 € / km
+                        </div>
+                    </div>
+                    <div class="vehicle-details">
+                        <div class="vehicle-header">
+                            <h3 class="vehicle-title" data-i18n="fleet-business-title">Berline Affaires</h3>
+                            <span class="vehicle-class" data-i18n="fleet-business-class">Mercedes Classe E / BMW Série 5</span>
+                        </div>
+                        <p class="vehicle-desc" data-i18n="fleet-business-desc">
+                            Un choix d'excellence alliant confort professionnel et discrétion. Parfaite pour vos transferts réguliers ou vos rendez-vous d'affaires.
+                        </p>
+                        <div class="vehicle-specs">
+                            <span class="spec-item"><i class="fa-solid fa-users" aria-hidden="true"></i> <span data-i18n="fleet-spec-passengers-3">3 Passagers</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> <span data-i18n="fleet-spec-baggage-3">3 Bagages</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-wifi" aria-hidden="true"></i> <span data-i18n="fleet-spec-wifi">Wi-Fi Gratuit</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-glass-water" aria-hidden="true"></i> <span data-i18n="fleet-spec-refreshments">Rafraîchissements</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-plug" aria-hidden="true"></i> <span data-i18n="fleet-spec-chargers">Chargeurs</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-snowflake" aria-hidden="true"></i> <span data-i18n="fleet-spec-ac">Clim Bizone</span></span>
+                        </div>
+                        <a href="#contact" class="btn btn-secondary btn-block select-vehicle-btn" data-vehicle="business" data-i18n="fleet-btn-business">
+                            Réserver la Berline Affaires
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Vehicle Card 2: Sedan -->
+                <div class="vehicle-card glass-panel-hover reveal-up">
+                    <div class="vehicle-img-wrapper">
+                        <img src="/assets/sedan.png" alt="Berline Premium SwiftRide" class="vehicle-img" width="600" height="360" loading="lazy" decoding="async">
+                        <div class="vehicle-price-badge" data-i18n="fleet-badge">
+                            Dès 3.20 € / km
+                        </div>
+                    </div>
+                    <div class="vehicle-details">
+                        <div class="vehicle-header">
+                            <h3 class="vehicle-title" data-i18n="fleet-sedan-title">Berline Premium</h3>
+                            <span class="vehicle-class" data-i18n="fleet-sedan-class">Mercedes Classe S / BMW Série 7</span>
+                        </div>
+                        <p class="vehicle-desc" data-i18n="fleet-sedan-desc">
+                            Une référence absolue de confort et d'élégance. Parfaite pour les déplacements professionnels, les couples ou les voyageurs d'affaires exigeants.
+                        </p>
+                        <div class="vehicle-specs">
+                            <span class="spec-item"><i class="fa-solid fa-users" aria-hidden="true"></i> <span data-i18n="fleet-spec-passengers-3">3 Passagers</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> <span data-i18n="fleet-spec-baggage-3">3 Bagages</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-wifi" aria-hidden="true"></i> <span data-i18n="fleet-spec-wifi">Wi-Fi Gratuit</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-glass-water" aria-hidden="true"></i> <span data-i18n="fleet-spec-refreshments">Rafraîchissements</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-plug" aria-hidden="true"></i> <span data-i18n="fleet-spec-chargers">Chargeurs</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-snowflake" aria-hidden="true"></i> <span data-i18n="fleet-spec-ac">Clim Bizone</span></span>
+                        </div>
+                        <a href="#contact" class="btn btn-secondary btn-block select-vehicle-btn" data-vehicle="sedan" data-i18n="fleet-btn-sedan">
+                            Réserver la Berline
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Vehicle Card 2: Van -->
+                <div class="vehicle-card glass-panel-hover reveal-right">
+                    <div class="vehicle-img-wrapper">
+                        <img src="/assets/van.png" alt="Grande Berline / Van SwiftRide" class="vehicle-img" width="600" height="360" loading="lazy" decoding="async">
+                        <div class="vehicle-price-badge" data-i18n="fleet-badge">
+                            Dès 3.20 € / km
+                        </div>
+                    </div>
+                    <div class="vehicle-details">
+                        <div class="vehicle-header">
+                            <h3 class="vehicle-title" data-i18n="fleet-van-title">Grande Berline / Van</h3>
+                            <span class="vehicle-class" data-i18n="fleet-van-class">Mercedes Classe V VIP (8 places)</span>
+                        </div>
+                        <p class="vehicle-desc" data-i18n="fleet-van-desc">
+                            Un espace généreux et modulable de type salon de luxe. Idéal pour les familles, les délégations ou les groupes VIP recherchant 8 places confortables avec bagages.
+                        </p>
+                        <div class="vehicle-specs">
+                            <span class="spec-item"><i class="fa-solid fa-users" aria-hidden="true"></i> <span data-i18n="fleet-spec-passengers-8">8 Passagers</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> <span data-i18n="fleet-spec-baggage-8">8 Bagages</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-wifi" aria-hidden="true"></i> <span data-i18n="fleet-spec-wifi-high">Wi-Fi Haut Débit</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-glass-water" aria-hidden="true"></i> <span data-i18n="fleet-spec-drinks-premium">Boissons Premium</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-plug" aria-hidden="true"></i> <span data-i18n="fleet-spec-usb">Ports USB individuels</span></span>
+                            <span class="spec-item"><i class="fa-solid fa-couch" aria-hidden="true"></i> <span data-i18n="fleet-spec-face-to-face">Salon en face-à-face</span></span>
+                        </div>
+                        <a href="#contact" class="btn btn-secondary btn-block select-vehicle-btn" data-vehicle="van" data-i18n="fleet-btn-van">
+                            Réserver la Grande Berline / Van
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== POPULAR DESTINATIONS ==================== -->
+    <section id="destinations" class="destinations-section">
+        <div class="container">
+            <div class="section-header text-center reveal-up">
+                <span class="section-tagline" data-i18n="dest-tagline">Destinations Clés & Côte d'Azur</span>
+                <h2 class="section-title" data-i18n="dest-title">Nos Liaisons les Plus Populaires</h2>
+                <div class="accent-line"></div>
+                <p class="section-desc" data-i18n="dest-desc">
+                    Découvrez nos tarifs de référence au départ ou à destination de l'Aéroport de Nice (NCE).
+                </p>
+            </div>
+            
+            <div class="destinations-grid">
+                <!-- Cannes -->
+                <div class="destination-card reveal-up reveal-delay-1">
+                    <div class="destination-banner" style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.85));">
+                        <div class="destination-badge">Cannes</div>
+                        <div class="destination-meta">
+                            <span><i class="fa-solid fa-road" aria-hidden="true"></i> ~30 km</span>
+                            <span><i class="fa-solid fa-clock" aria-hidden="true"></i> ~35 min</span>
+                        </div>
+                    </div>
+                    <div class="destination-body">
+                        <p class="destination-intro" data-i18n="dest-cannes-intro">Rejoignez la Croisette, son Palais des Festivals et ses hôtels mythiques.</p>
+                        <div class="destination-prices">
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-car gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-sedan">Berline Premium :</span></span>
+                                <strong class="gold-text">~ 96 €</strong>
+                            </div>
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-van-shuttle gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-van">Van de Luxe :</span></span>
+                                <strong class="gold-text">~ 115 €</strong>
+                            </div>
+                        </div>
+                        <button class="btn btn-small btn-block quick-book-btn" data-dest="cannes" data-i18n="dest-btn-book">Réserver ce trajet</button>
+                    </div>
+                </div>
+                
+                <!-- Monaco -->
+                <div class="destination-card reveal-up reveal-delay-2">
+                    <div class="destination-banner" style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.85));">
+                        <div class="destination-badge">Monaco</div>
+                        <div class="destination-meta">
+                            <span><i class="fa-solid fa-road" aria-hidden="true"></i> ~32 km</span>
+                            <span><i class="fa-solid fa-clock" aria-hidden="true"></i> ~30 min</span>
+                        </div>
+                    </div>
+                    <div class="destination-body">
+                        <p class="destination-intro" data-i18n="dest-monaco-intro">Le luxe absolu du Rocher, son casino mythique et son port de plaisance prestigieux.</p>
+                        <div class="destination-prices">
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-car gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-sedan">Berline Premium :</span></span>
+                                <strong class="gold-text">~ 102 €</strong>
+                            </div>
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-van-shuttle gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-van">Van de Luxe :</span></span>
+                                <strong class="gold-text">~ 122 €</strong>
+                            </div>
+                        </div>
+                        <button class="btn btn-small btn-block quick-book-btn" data-dest="monaco" data-i18n="dest-btn-book">Réserver ce trajet</button>
+                    </div>
+                </div>
+                
+                <!-- Saint-Tropez -->
+                <div class="destination-card reveal-up reveal-delay-3">
+                    <div class="destination-banner" style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.85));">
+                        <div class="destination-badge">Saint-Tropez</div>
+                        <div class="destination-meta">
+                            <span><i class="fa-solid fa-road" aria-hidden="true"></i> ~110 km</span>
+                            <span><i class="fa-solid fa-clock" aria-hidden="true"></i> ~1h 30m</span>
+                        </div>
+                    </div>
+                    <div class="destination-body">
+                        <p class="destination-intro" data-i18n="dest-sttropez-intro">L'incontournable village de pêcheurs des stars, ses plages de sable fin et sa vie nocturne.</p>
+                        <div class="destination-prices">
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-car gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-sedan">Berline Premium :</span></span>
+                                <strong class="gold-text">~ 352 €</strong>
+                            </div>
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-van-shuttle gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-van">Van de Luxe :</span></span>
+                                <strong class="gold-text">~ 422 €</strong>
+                            </div>
+                        </div>
+                        <button class="btn btn-small btn-block quick-book-btn" data-dest="saint-tropez" data-i18n="dest-btn-book">Réserver ce trajet</button>
+                    </div>
+                </div>
+                
+                <!-- Marseille -->
+                <div class="destination-card reveal-up reveal-delay-4">
+                    <div class="destination-banner" style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.85));">
+                        <div class="destination-badge">Marseille</div>
+                        <div class="destination-meta">
+                            <span><i class="fa-solid fa-road" aria-hidden="true"></i> ~185 km</span>
+                            <span><i class="fa-solid fa-clock" aria-hidden="true"></i> ~2h 00m</span>
+                        </div>
+                    </div>
+                    <div class="destination-body">
+                        <p class="destination-intro" data-i18n="dest-marseille-intro">Rejoignez la cité phocéenne, son Vieux-Port et son pôle d'affaires métropolitain.</p>
+                        <div class="destination-prices">
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-car gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-sedan">Berline Premium :</span></span>
+                                <strong class="gold-text">~ 592 €</strong>
+                            </div>
+                            <div class="price-row">
+                                <span><i class="fa-solid fa-van-shuttle gold-text" aria-hidden="true"></i> <span data-i18n="dest-label-van">Van de Luxe :</span></span>
+                                <strong class="gold-text">~ 710 €</strong>
+                            </div>
+                        </div>
+                        <button class="btn btn-small btn-block quick-book-btn" data-dest="marseille" data-i18n="dest-btn-book">Réserver ce trajet</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="destination-note text-center">
+                <p><i class="fa-solid fa-circle-info gold-text" aria-hidden="true"></i> <span data-i18n="dest-note">Au-delà des destinations présentées, nous effectuons des trajets vers <strong>toute la France et l'Europe (Italie, Suisse)</strong> sur simple demande.</span></p>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- ==================== PREMIUM SERVICES ==================== -->
+    <section id="services" class="services-section">
+        <div class="container">
+            <div class="section-header text-center reveal-up">
+                <span class="section-tagline" data-i18n="serv-tagline">Pourquoi Choisir SwiftRide ?</span>
+                <h2 class="section-title" data-i18n="serv-title">Les Avantages d'un Service 5 Étoiles</h2>
+                <div class="accent-line"></div>
+                <p class="section-desc" data-i18n="serv-desc">
+                    Chaque trajet avec SwiftRide est pensé pour vous procurer une tranquillité d'esprit absolue et un confort sans concession.
+                </p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Service 1 -->
+                <div class="service-item glass-panel reveal-up reveal-delay-1">
+                    <div class="service-icon-wrapper">
+                        <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="serv-driver-title">Chauffeurs Professionnels</h3>
+                    <p data-i18n="serv-driver-desc">Nos chauffeurs sont bilingues, rigoureusement sélectionnés pour leur discrétion, leur courtoisie et leur conduite souple.</p>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="service-item glass-panel reveal-up reveal-delay-2">
+                    <div class="service-icon-wrapper">
+                        <i class="fa-solid fa-plane-arrival" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="serv-vip-title">Accueil Aéroport VIP</h3>
+                    <p data-i18n="serv-vip-desc">Suivi de votre vol en temps réel. Votre chauffeur vous accueille en personne aux arrivées avec une pancarte nominative.</p>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="service-item glass-panel reveal-up reveal-delay-3">
+                    <div class="service-icon-wrapper">
+                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="serv-rate-title">Tarif Sans Surprise</h3>
+                    <p data-i18n="serv-rate-desc">Le tarif est fixé lors de l'estimation. Il comprend les péages, les bagages, l'attente à l'aéroport et les taxes de service.</p>
+                </div>
+                
+                <!-- Service 4 -->
+                <div class="service-item glass-panel reveal-up reveal-delay-4">
+                    <div class="service-icon-wrapper">
+                        <i class="fa-solid fa-mug-hot" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="serv-onboard-title">Services Exclusifs à Bord</h3>
+                    <p data-i18n="serv-onboard-desc">Wi-Fi haut débit, bouteilles d'eau fraîches, chargeurs pour vos appareils et climatisation personnalisée.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BOOKING / CONTACT FORM ==================== -->
+    <section id="contact" class="booking-section">
+        <div class="container">
+            <div class="booking-container-layout">
+                <div class="booking-info-pane reveal-left">
+                    <span class="section-tagline" data-i18n="book-tagline">Réservation Prioritaire</span>
+                    <h2 class="section-title text-left" data-i18n="book-title">Planifiez Votre Transfert Premium</h2>
+                    <p class="booking-intro-text" data-i18n="book-desc">
+                        Remplissez notre formulaire pour soumettre une demande de réservation ou un devis personnalisé. Notre équipe administrative traite votre demande sous 15 minutes.
+                    </p>
+                    
+                    <div class="contact-details-list">
+                        <div class="contact-detail-item">
+                            <div class="icon-box"><i class="fa-solid fa-phone" aria-hidden="true"></i></div>
+                            <div>
+                                <span data-i18n="book-support-title">Support Téléphonique 24/7</span>
+                                <a href="tel:+33695956105" style="color: inherit; text-decoration: none;"><strong>+33 (0)6 95 95 61 05</strong></a>
+                            </div>
+                        </div>
+                        <div class="contact-detail-item">
+                            <div class="icon-box"><i class="fa-solid fa-envelope" aria-hidden="true"></i></div>
+                            <div>
+                                <span data-i18n="book-email-title">Email Professionnel</span>
+                                <strong>contact@swiftride.fr</strong>
+                            </div>
+                        </div>
+                        <div class="contact-detail-item">
+                            <div class="icon-box"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></div>
+                            <div>
+                                <span data-i18n="book-addr-title">Adresse Administrative</span>
+                                <strong data-i18n="book-addr-val">8 Rue Général Saramito, 06300 Nice, France</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links-container">
+                        <a href="#" aria-label="Facebook SwiftRide"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                        <a href="#" aria-label="Instagram SwiftRide"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                        <a href="#" aria-label="LinkedIn SwiftRide"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                
+                <div class="booking-form-pane glass-panel reveal-right">
+                    <form id="bookingForm">
+                        <!-- Booking Wizard Steps Indicator -->
+                        <div class="booking-wizard-steps">
+                            <div class="wizard-step-indicator active" data-step="1">
+                                <span class="step-num">1</span>
+                                <span class="step-label" data-i18n="step-trip">Trajet</span>
+                            </div>
+                            <div class="wizard-step-line"></div>
+                            <div class="wizard-step-indicator" data-step="2">
+                                <span class="step-num">2</span>
+                                <span class="step-label" data-i18n="step-vehicle">Véhicule</span>
+                            </div>
+                            <div class="wizard-step-line"></div>
+                            <div class="wizard-step-indicator" data-step="3">
+                                <span class="step-num">3</span>
+                                <span class="step-label" data-i18n="step-client">Client</span>
+                            </div>
+                            <div class="wizard-step-line"></div>
+                            <div class="wizard-step-indicator" data-step="4">
+                                <span class="step-num">4</span>
+                                <span class="step-label" data-i18n="step-payment">Paiement</span>
+                            </div>
+                        </div>
+
+                        <!-- STEP 1: TRIP DETAILS -->
+                        <div class="wizard-step-pane active" id="stepPane1">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="bookPickup" data-i18n="book-form-pickup">Lieu de Départ *</label>
+                                    <input type="text" id="bookPickup" value="Aéroport de Nice-Côte d'Azur (NCE)" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookDropoff" data-i18n="book-form-dropoff">Lieu d'Arrivée / Destination *</label>
+                                    <div class="select-wrapper">
+                                        <select id="bookDropoff" required>
+                                            <option value="" disabled selected data-i18n="book-placeholder-dropoff">Sélectionnez la destination</option>
+                                            <option value="cannes" data-i18n="calc-opt-cannes">Cannes (~30 km)</option>
+                                            <option value="monaco" data-i18n="calc-opt-monaco">Monaco (~32 km)</option>
+                                            <option value="saint-tropez" data-i18n="calc-opt-sttropez">Saint-Tropez (~110 km)</option>
+                                            <option value="marseille" data-i18n="calc-opt-marseille">Marseille (~185 km)</option>
+                                            <option value="autre" data-i18n="calc-opt-other">Autre destination...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" id="bookCustomDistanceGroup" style="display: none; grid-column: span 2;">
+                                    <label for="bookCustomDistance"><i class="fa-solid fa-road gold-text" aria-hidden="true"></i> <span data-i18n="calc-label-distance">Estimer la distance (en km)</span></label>
+                                    <input type="number" id="bookCustomDistance" min="1" max="1000" placeholder="Ex: 50" data-i18n-placeholder="calc-placeholder-distance">
+                                </div>
+
+                                <div class="form-group" id="bookCustomAddressGroup" style="display: none; grid-column: span 2;">
+                                    <label for="bookCustomAddress"><i class="fa-solid fa-location-dot gold-text" aria-hidden="true"></i> <span>Adresse exacte de destination *</span></label>
+                                    <input type="text" id="bookCustomAddress" placeholder="Ex: 15 Avenue des Fleurs, Nice">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookDate" data-i18n="book-form-date">Date & Heure de Prise en Charge *</label>
+                                    <input type="text" id="bookDate" placeholder="Sélectionnez Date & Heure" data-i18n-placeholder="book-placeholder-date" readonly required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookFlight" data-i18n="book-form-flight">Numéro de Vol (Recommandé)</label>
+                                    <input type="text" id="bookFlight" placeholder="Ex: AF7700" data-i18n-placeholder="book-placeholder-flight">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: VEHICLE & LUGGAGE -->
+                        <div class="wizard-step-pane" id="stepPane2" style="display: none;">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="bookVehicle" data-i18n="book-form-vehicle">Catégorie de Véhicule *</label>
+                                    <div class="select-wrapper">
+                                        <select id="bookVehicle">
+                                            <option value="business" data-i18n="book-opt-business">Berline Affaires (Mercedes Classe E)</option>
+                                            <option value="sedan" data-i18n="book-opt-sedan">Berline Premium (Mercedes Classe S)</option>
+                                            <option value="van" data-i18n="book-opt-van">Grande Berline / Van (Mercedes Classe V - 8 places)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookLuggageCount" data-i18n="book-form-luggage-count">Nombre de Valises</label>
+                                    <div class="select-wrapper">
+                                        <select id="bookLuggageCount">
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="display: none; grid-column: span 2; margin-top: 10px;" id="luggageSizesContainer">
+                                    <!-- Dynamic suitcase selectors will be injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: CUSTOMER INFO -->
+                        <div class="wizard-step-pane" id="stepPane3" style="display: none;">
+                            <div class="form-grid">
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label for="bookName" data-i18n="book-form-name">Nom Complet *</label>
+                                    <input type="text" id="bookName" placeholder="Ex: Jean Dupont" data-i18n-placeholder="book-placeholder-name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookEmail" data-i18n="book-form-email">Adresse Email *</label>
+                                    <input type="email" id="bookEmail" placeholder="Ex: jean.dupont@email.com" data-i18n-placeholder="book-placeholder-email" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookPhone" data-i18n="book-form-phone">Numéro de Téléphone *</label>
+                                    <input type="tel" id="bookPhone" placeholder="Ex: +33 6 12 34 56 78" data-i18n-placeholder="book-placeholder-phone" required>
+                                </div>
+                                
+                                <div class="form-group" style="grid-column: span 2; margin-top: 10px;">
+                                    <label for="bookNotes" data-i18n="book-form-notes">Instructions Spéciales / Demandes Particulières</label>
+                                    <textarea id="bookNotes" rows="3" placeholder="Sièges bébés, bagages hors gabarit, boissons spécifiques..." data-i18n-placeholder="book-placeholder-notes"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: GUARANTEE & PAYMENT -->
+                        <div class="wizard-step-pane" id="stepPane4" style="display: none;">
+                            <div class="form-grid">
+                                <!-- Live Estimated Price Summary -->
+                                <div class="form-group" style="grid-column: span 2; margin-bottom: 20px;">
+                                    <div class="price-summary-box glass-panel-hover" style="border: 1px solid var(--color-primary-gold); padding: 1.25rem 1.5rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.4);">
+                                        <div>
+                                            <span style="font-size: 0.8rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block;" data-i18n="book-price-title">Prix total estimé (TTC)</span>
+                                            <span style="font-size: 0.9rem; color: var(--color-text-light); font-weight: 500;" id="bookPriceDetails">Sélectionnez vos options de trajet</span>
+                                        </div>
+                                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--color-primary-gold); white-space: nowrap;"><span id="bookEstimatedPrice">0.00</span> €</div>
+                                    </div>
+                                </div>
+                                <!-- Payment Method Selector -->
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label data-i18n="book-form-payment-method">Mode de Paiement *</label>
+                                    <div class="payment-method-group">
+                                        <label class="payment-radio-option checked">
+                                            <input type="radio" name="bookPaymentMethod" value="cash" checked>
+                                            <div class="radio-content-row">
+                                                <i class="fa-solid fa-money-bill-wave gold-text"></i>
+                                                <span data-i18n="opt-payment-cash">Paiement à bord (Espèces / Cash)</span>
+                                            </div>
+                                        </label>
+                                        <label class="payment-radio-option">
+                                            <input type="radio" name="bookPaymentMethod" value="card">
+                                            <div class="radio-content-row">
+                                                <i class="fa-solid fa-credit-card gold-text"></i>
+                                                <span data-i18n="opt-payment-card">Paiement par Carte Bancaire</span>
+                                            </div>
+                                        </label>
+                                        <label class="payment-radio-option">
+                                            <input type="radio" name="bookPaymentMethod" value="revolut">
+                                            <div class="radio-content-row">
+                                                <i class="fa-solid fa-wallet gold-text"></i>
+                                                <span data-i18n="opt-payment-revolut">Paiement via Revolut</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Credit Card Details (Always required as guarantee/payment) -->
+                                <div class="form-group" style="grid-column: span 2; margin-top: 15px;" id="creditCardSection">
+                                    <label style="margin-bottom: 15px; color: var(--color-text-light);">
+                                        <i class="fa-solid fa-shield-halved gold-text"></i> 
+                                        <span id="cardSectionTitle" data-i18n="book-card-section-guarantee">Garantie par Carte Bancaire *</span>
+                                    </label>
+                                    
+                                    <div class="credit-card-inputs-grid">
+                                        <div class="form-group">
+                                            <label for="cardName" data-i18n="book-form-card-name">Nom sur la carte *</label>
+                                            <input type="text" id="cardName" placeholder="Ex: JEAN DUPONT" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="cardNumber" data-i18n="book-form-card-number">Numéro de carte *</label>
+                                            <div class="input-wrapper card-number-wrapper">
+                                                <input type="text" id="cardNumber" placeholder="xxxx xxxx xxxx xxxx" maxlength="19" required>
+                                                <i class="fa-solid fa-credit-card card-brand-icon" id="cardBrandIcon"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="cardExpiry" data-i18n="book-form-card-expiry">Date d'expiration (MM/AA) *</label>
+                                            <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="cardCvv" data-i18n="book-form-card-cvv">CVV *</label>
+                                            <input type="password" id="cardCvv" placeholder="xxx" maxlength="4" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-security-note">
+                                        <i class="fa-solid fa-lock security-lock-icon"></i>
+                                        <span data-i18n="book-card-security-note">Vos données de paiement sont cryptées et stockées de manière hautement sécurisée pour garantir votre réservation.</span>
+                                    </p>
+                                </div>
+
+                                <!-- Revolut Payment Info Section -->
+                                <div class="form-group" style="grid-column: span 2; margin-top: 15px; display: none;" id="revolutSection">
+                                    <div class="revolut-info-box glass-panel-hover" style="border: 1px solid var(--color-primary-gold); padding: 1.5rem; border-radius: 8px; text-align: center; background: rgba(0, 0, 0, 0.4);">
+                                        <i class="fa-solid fa-wallet gold-text" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                                        <h4 style="color: var(--color-text-light); margin-bottom: 0.5rem; font-size: 1.15rem;" data-i18n="revolut-title">Paiement Sécurisé Revolut</h4>
+                                        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.5;" data-i18n="revolut-desc">Le règlement sera effectué via la plateforme sécurisée de Revolut. Vos coordonnées bancaires ne transitent pas par notre serveur.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wizard Navigation Buttons -->
+                        <div class="form-wizard-buttons" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; width: 100%;">
+                            <button type="button" class="btn btn-secondary" id="btnPrevStep" style="display: none;">
+                                <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn-prev">Précédent</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" id="btnNextStep">
+                                <span data-i18n="btn-next">Suivant</span> <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btnSubmitBooking" style="display: none;">
+                                <i class="fa-solid fa-paper-plane"></i> <span data-i18n="book-btn-submit">Envoyer ma demande de réservation</span>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Success Message Box -->
+                    <div id="bookingSuccessBox" class="success-message-box" style="display: none;">
+                        <i class="fa-solid fa-circle-check success-icon gold-text" aria-hidden="true"></i>
+                        <h3 data-i18n="success-title">Demande Reçue !</h3>
+                        <p id="successDescText" data-i18n="success-desc">Merci pour votre confiance. Un e-mail récapitulatif vient de vous être envoyé. Notre équipe commerciale vous contactera d'ici quelques instants par téléphone ou e-mail pour finaliser la réservation.</p>
+                        
+                        <!-- Dynamic Payment Link Container -->
+                        <div id="paymentRedirectContainer" style="margin: 2.5rem 0; display: none;">
+                            <a href="#" id="btnPaymentRedirect" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; text-decoration: none; border-radius: 8px;">
+                                <i class="fa-solid fa-wallet"></i> <span data-i18n="btn-pay-now">Procéder au paiement Revolut</span>
+                            </a>
+                            <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.75rem;" data-i18n="pay-redirect-warning">Si la page de paiement ne s'est pas ouverte automatiquement, veuillez cliquer sur le bouton ci-dessus.</p>
+                        </div>
+
+                        <button type="button" id="btnResetBooking" class="btn btn-secondary btn-small" data-i18n="success-btn-reset">Nouvelle demande</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== REVOLUT SIMULATOR MODAL ==================== -->
+    <div class="admin-modal-overlay" id="revolutMockModalOverlay" style="display: none; justify-content: center; align-items: center; z-index: 10000; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);">
+        <div class="glass-panel text-center" style="max-width: 480px; width: 90%; padding: 2.5rem; border-radius: 12px; border: 1px solid var(--color-primary-gold); position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+            <div style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.5rem; cursor: pointer; color: var(--color-text-muted);" id="btnRevolutModalClose">&times;</div>
+            
+            <div style="background: #ffffff; color: #191c1f; border-radius: 50%; width: 70px; height: 70px; display: inline-flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; font-family: 'Outfit', sans-serif; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(255,255,255,0.2);">
+                R
+            </div>
+            
+            <h3 style="color: #ffffff; font-family: 'Outfit', sans-serif; margin-bottom: 1rem;" data-i18n="revolut-modal-title">Simulation de Paiement Revolut Pay</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem;" data-i18n="revolut-modal-desc">Pour tester le parcours utilisateur, cliquez sur le bouton ci-dessous pour simuler une confirmation de paiement réussie.</p>
+            
+            <div style="background: rgba(212, 175, 55, 0.1); border-radius: 6px; padding: 1rem; margin-bottom: 2rem; border-left: 4px solid var(--color-primary-gold);">
+                <div style="font-size: 0.8rem; color: var(--color-text-muted); text-transform: uppercase;" data-i18n="calc-label-vehicle">Montant Estimé</div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--color-primary-gold); margin-top: 0.25rem;"><span id="revolutMockPrice">--.--</span> €</div>
+            </div>
+            
+            <button type="button" class="btn btn-primary btn-block" id="btnSimulateRevolutSuccess" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-circle-check"></i> <span data-i18n="revolut-modal-btn">Simuler le paiement</span>
+            </button>
+            
+            <div style="font-size: 0.8rem; color: var(--color-text-muted);" data-i18n="revolut-modal-footer">Ceci est un environnement de test SwiftRide.</div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <%- include('partials/footer') %>
+
+    <%- include('partials/scripts') %>
+</body>
+</html>

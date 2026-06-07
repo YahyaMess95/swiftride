@@ -1,0 +1,93 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : "SwiftRide - Chauffeur Privé VTC de Luxe Côte d'Azur | Nice Cannes Monaco" %></title>
+    
+    <% if (typeof showSEO !== 'undefined' && showSEO) { %>
+        <meta name="description" content="Réservez votre transfert VTC d'exception depuis l'Aéroport de Nice (NCE) vers Cannes, Monaco, Saint-Tropez, Marseille et toute la France. Tarif fixe transparent à 3.20€/km. Flotte de prestige Berline & Van.">
+        <meta name="keywords" content="VTC Nice, Chauffeur privé Nice, Transfert aéroport Nice, Nice Monaco VTC, Nice Cannes VTC, SwiftRide, VTC luxe, Chauffeur Cote d'Azur">
+        <meta name="author" content="SwiftRide">
+        <meta name="robots" content="index, follow, max-image-preview:large">
+        <link rel="canonical" href="https://www.swiftride.fr/">
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://www.swiftride.fr/">
+        <meta property="og:title" content="SwiftRide - Chauffeur Privé VTC de Luxe Côte d'Azur | Nice Cannes Monaco">
+        <meta property="og:description" content="Réservez votre transfert VTC d'exception depuis l'Aéroport de Nice (NCE) vers Cannes, Monaco, Saint-Tropez, Marseille et toute la France. Tarif fixe transparent à 3.20€/km. Flotte de prestige Berline & Van.">
+        <meta property="og:image" content="https://www.swiftride.fr/assets/prestige_logo.png">
+        <meta property="og:site_name" content="SwiftRide">
+        <meta property="og:locale" content="fr_FR">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="https://www.swiftride.fr/">
+        <meta name="twitter:title" content="SwiftRide - Chauffeur Privé VTC de Luxe Côte d'Azur | Nice Cannes Monaco">
+        <meta name="twitter:description" content="Réservez votre transfert VTC d'exception depuis l'Aéroport de Nice (NCE) vers Cannes, Monaco, Saint-Tropez, Marseille et toute la France. Tarif fixe transparent à 3.20€/km. Flotte de prestige Berline & Van.">
+        <meta name="twitter:image" content="https://www.swiftride.fr/assets/prestige_logo.png">
+    <% } %>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flatpickr (Premium DateTime Picker) CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    
+    <link rel="stylesheet" href="/style.css">
+    <!-- Revolut Checkout SDK -->
+    <script src="https://assets.revolut.com/checkout.js"></script>
+
+    <% if (typeof showSEO !== 'undefined' && showSEO) { %>
+        <!-- JSON-LD Structured Data for LocalBusiness & TaxiService -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "TaxiService",
+              "@id": "https://www.swiftride.fr/#taxiservice",
+              "name": "SwiftRide VTC",
+              "description": "Service de chauffeur privé VTC de luxe sur la Côte d'Azur. Transferts depuis l'Aéroport de Nice (NCE) vers Monaco, Cannes, Saint-Tropez et Marseille.",
+              "provider": {
+                "@type": "LocalBusiness",
+                "@id": "https://www.swiftride.fr/#organization",
+                "name": "SwiftRide",
+                "image": "https://www.swiftride.fr/assets/prestige_logo.png",
+                "logo": "https://www.swiftride.fr/assets/prestige_logo.png",
+                "telephone": "+33 6 95 95 61 05",
+                "email": "contact@swiftride.fr",
+                "address": {
+                  "@type": "PostalAddress",
+                  "streetAddress": "8 Rue Général Saramito",
+                  "addressLocality": "Nice",
+                  "postalCode": "06300",
+                  "addressCountry": "FR"
+                },
+                "priceRange": "$$"
+              },
+              "areaServed": [
+                { "@type": "AdministrativeArea", "name": "Nice" },
+                { "@type": "AdministrativeArea", "name": "Cannes" },
+                { "@type": "AdministrativeArea", "name": "Monaco" },
+                { "@type": "AdministrativeArea", "name": "Saint-Tropez" },
+                { "@type": "AdministrativeArea", "name": "Marseille" },
+                { "@type": "AdministrativeArea", "name": "Côte d'Azur" }
+              ],
+              "offers": {
+                "@type": "Offer",
+                "price": "3.20",
+                "priceCurrency": "EUR",
+                "description": "Tarif de base fixe à 3.20 € par kilomètre"
+              }
+            }
+          ]
+        }
+        </script>
+    <% } %>
+</head>
