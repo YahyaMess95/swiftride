@@ -31,7 +31,7 @@ try {
     DATA_DIR = path.join(os.tmpdir(), 'swiftride-data');
     CARDS_DIR = path.join(DATA_DIR, 'cards');
     RESERVATIONS_FILE = path.join(DATA_DIR, 'reservations.json');
-    
+
     try {
         if (!fs.existsSync(DATA_DIR)) {
             fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -52,7 +52,7 @@ try {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-
+console.log("test deployment is this working")
 // Set EJS view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
