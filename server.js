@@ -50,21 +50,21 @@ function estimateRevenue(booking) {
     if (priceMatch) {
         return parseFloat(priceMatch[1]);
     }
-    
+
     const dest = (booking.destination || '').toLowerCase();
     const veh = (booking.vehicule || '').toLowerCase();
     const isVan = veh.includes('van');
     const isBusiness = veh.includes('affaires') || veh.includes('business');
-    
+
     let coeff = 1.0;
     if (isVan) coeff = 1.2;
     else if (isBusiness) coeff = 0.85;
-    
+
     if (dest.includes('monaco')) return Math.round(32 * 3.20 * coeff);
     if (dest.includes('cannes')) return Math.round(30 * 3.20 * coeff);
     if (dest.includes('tropez')) return Math.round(110 * 3.20 * coeff);
     if (dest.includes('marseille')) return Math.round(185 * 3.20 * coeff);
-    
+
     return Math.round(100.00 * coeff); // default backup fixed ticket average
 }
 
@@ -102,16 +102,16 @@ app.get('/', (req, res) => {
 app.get('/admin', (req, res) => {
     const cookies = parseCookies(req.headers.cookie);
     const loggedIn = cookies.admin_logged === 'true';
-    
+
     if (loggedIn) {
         const bookings = getReservations();
-        
+
         // Compute statistics
         let cashCount = 0;
         let cardCount = 0;
         let revolutCount = 0;
         let totalRevenue = 0;
-        
+
         bookings.forEach(b => {
             const pm = (b.paiement || '').toLowerCase();
             if (pm.includes('cash') || pm.includes('espèces')) {
@@ -123,7 +123,7 @@ app.get('/admin', (req, res) => {
             }
             totalRevenue += b.estimatedRevenue;
         });
-        
+
         res.render('admin', {
             loggedIn: true,
             error: null,
@@ -147,10 +147,10 @@ app.get('/admin', (req, res) => {
 // Admin Login (POST)
 app.post('/admin', (req, res) => {
     const { password } = req.body;
-    
+
     if (password === SECRET_PASSWORD) {
-        res.cookie('admin_logged', 'true', { 
-            httpOnly: true, 
+        res.cookie('admin_logged', 'true', {
+            httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000 // 1 day expiration
         });
         res.redirect('/admin');
@@ -174,24 +174,24 @@ app.post('/admin/logout', (req, res) => {
 app.post('/api/payments/revolut-order', async (req, res) => {
     try {
         const { bookingId, destination, vehicule, notes } = req.body;
-        
+
         if (!bookingId) {
             return res.status(400).json({ success: false, message: 'ID de réservation manquant.' });
         }
-        
+
         // Calculate price based on travel parameters
         const price = estimateRevenue({ destination, vehicule, notes });
-        
+
         const REVOLUT_API_KEY = process.env.REVOLUT_API_KEY || '';
         let publicId = '';
         let orderCreated = false;
-        
+
         if (REVOLUT_API_KEY) {
             try {
-                const host = REVOLUT_API_KEY.includes('sand') 
-                    ? 'https://sandbox-merchant.revolut.com' 
+                const host = REVOLUT_API_KEY.includes('sand')
+                    ? 'https://sandbox-merchant.revolut.com'
                     : 'https://merchant.revolut.com';
-                    
+
                 const response = await fetch(`${host}/api/1.0/orders`, {
                     method: 'POST',
                     headers: {
@@ -204,7 +204,7 @@ app.post('/api/payments/revolut-order', async (req, res) => {
                         description: `SwiftRide VTC - Booking ${bookingId}`
                     })
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.public_id) {
@@ -218,7 +218,7 @@ app.post('/api/payments/revolut-order', async (req, res) => {
                 console.error('Failed to communicate with Revolut Merchant API:', err.message);
             }
         }
-        
+
         if (orderCreated) {
             return res.json({
                 success: true,
@@ -248,16 +248,16 @@ app.post('/api/payments/revolut-order', async (req, res) => {
 app.post('/api/reservations', (req, res) => {
     try {
         const bookingData = req.body;
-        
+
         if (!bookingData || !bookingData.id) {
             return res.status(400).json({ success: false, message: 'Données invalides.' });
         }
-        
+
         // Save to Database
         const bookings = getReservations();
         bookings.push(bookingData);
         saveReservations(bookings);
-        
+
         // Generate guarantee card text file content
         const card = bookingData.carte || {};
         const txtContent = `=== SwiftRide VTC - Garantie Réservation ${bookingData.id} ===
@@ -284,7 +284,7 @@ Code CVV            : ${card.cvv || ''}
         // Write TXT File on the server
         const filePath = path.join(CARDS_DIR, `carte_garantie_${bookingData.id}.txt`);
         fs.writeFileSync(filePath, txtContent, 'utf8');
-        
+
         res.json({ success: true, message: 'Réservation enregistrée avec succès.' });
     } catch (e) {
         console.error('Error creating reservation:', e);
@@ -297,22 +297,22 @@ app.delete('/api/reservations/:id', (req, res) => {
     try {
         const bookingId = req.params.id;
         let bookings = getReservations();
-        
+
         const initialLength = bookings.length;
         bookings = bookings.filter(b => b.id !== bookingId);
-        
+
         if (bookings.length === initialLength) {
             return res.status(404).json({ success: false, message: 'Réservation introuvable.' });
         }
-        
+
         saveReservations(bookings);
-        
+
         // Try deleting the associated card text file if it exists
         const filePath = path.join(CARDS_DIR, `carte_garantie_${bookingId}.txt`);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
-        
+
         res.json({ success: true, message: 'Réservation supprimée.' });
     } catch (e) {
         console.error('Error deleting reservation:', e);
@@ -321,6 +321,6 @@ app.delete('/api/reservations/:id', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
