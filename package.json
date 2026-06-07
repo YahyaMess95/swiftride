@@ -4,6 +4,7 @@
   "description": "SwiftRide VTC Luxury Showcase Website and Booking System",
   "main": "server.js",
   "scripts": {
+    "build": "echo 'No build step required'",
     "start": "node server.js"
   },
   "dependencies": {
