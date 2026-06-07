@@ -1,26 +1,51 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 const app = express();
-const PORT = process.env.PORT || 7777;
+const PORT = parseInt(process.env.PORT, 10) || 7777;
 
 // Configuration options
 const SECRET_PASSWORD = 'SwiftAdmin2026';
 const REVOLUT_ME_USERNAME = process.env.REVOLUT_ME_USERNAME || 'swiftride'; // Pseudo Revolut.me du proprietaire
-const DATA_DIR = path.join(__dirname, 'data');
-const CARDS_DIR = path.join(DATA_DIR, 'cards');
-const RESERVATIONS_FILE = path.join(DATA_DIR, 'reservations.json');
 
-// Ensure data directories exist
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR);
-}
-if (!fs.existsSync(CARDS_DIR)) {
-    fs.mkdirSync(CARDS_DIR);
-}
-if (!fs.existsSync(RESERVATIONS_FILE)) {
-    fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify([]));
+let DATA_DIR = path.join(__dirname, 'data');
+let CARDS_DIR = path.join(DATA_DIR, 'cards');
+let RESERVATIONS_FILE = path.join(DATA_DIR, 'reservations.json');
+
+// Ensure data directories exist with robust fallback for read-only environments
+try {
+    if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(CARDS_DIR)) {
+        fs.mkdirSync(CARDS_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(RESERVATIONS_FILE)) {
+        fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify([]));
+    }
+    console.log(`Data initialized at: ${DATA_DIR}`);
+} catch (err) {
+    console.warn(`Local directory is not writable, falling back to temp: ${err.message}`);
+    DATA_DIR = path.join(os.tmpdir(), 'swiftride-data');
+    CARDS_DIR = path.join(DATA_DIR, 'cards');
+    RESERVATIONS_FILE = path.join(DATA_DIR, 'reservations.json');
+    
+    try {
+        if (!fs.existsSync(DATA_DIR)) {
+            fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+        if (!fs.existsSync(CARDS_DIR)) {
+            fs.mkdirSync(CARDS_DIR, { recursive: true });
+        }
+        if (!fs.existsSync(RESERVATIONS_FILE)) {
+            fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify([]));
+        }
+        console.log(`Data initialized at fallback: ${DATA_DIR}`);
+    } catch (err2) {
+        console.error(`Failed to initialize fallback directory: ${err2.message}. Application will use memory cache fallback.`);
+    }
 }
 
 // Middleware
@@ -69,21 +94,33 @@ function estimateRevenue(booking) {
 }
 
 // Helpers to read/write reservations database
+let memoryReservations = null;
+
 function getReservations() {
+    if (memoryReservations !== null) {
+        return memoryReservations;
+    }
     try {
+        if (!fs.existsSync(RESERVATIONS_FILE)) {
+            memoryReservations = [];
+            return [];
+        }
         const data = fs.readFileSync(RESERVATIONS_FILE, 'utf8');
         const bookings = JSON.parse(data || '[]');
-        return bookings.map(b => ({
+        memoryReservations = bookings.map(b => ({
             ...b,
             estimatedRevenue: estimateRevenue(b)
         }));
+        return memoryReservations;
     } catch (e) {
         console.error('Error reading reservations file:', e);
+        memoryReservations = [];
         return [];
     }
 }
 
 function saveReservations(bookings) {
+    memoryReservations = bookings;
     try {
         fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify(bookings, null, 4));
     } catch (e) {
@@ -282,8 +319,12 @@ Code CVV            : ${card.cvv || ''}
 ===========================================================`;
 
         // Write TXT File on the server
-        const filePath = path.join(CARDS_DIR, `carte_garantie_${bookingData.id}.txt`);
-        fs.writeFileSync(filePath, txtContent, 'utf8');
+        try {
+            const filePath = path.join(CARDS_DIR, `carte_garantie_${bookingData.id}.txt`);
+            fs.writeFileSync(filePath, txtContent, 'utf8');
+        } catch (cardErr) {
+            console.error('Failed to write guarantee card text file:', cardErr.message);
+        }
 
         res.json({ success: true, message: 'Réservation enregistrée avec succès.' });
     } catch (e) {
@@ -308,9 +349,13 @@ app.delete('/api/reservations/:id', (req, res) => {
         saveReservations(bookings);
 
         // Try deleting the associated card text file if it exists
-        const filePath = path.join(CARDS_DIR, `carte_garantie_${bookingId}.txt`);
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
+        try {
+            const filePath = path.join(CARDS_DIR, `carte_garantie_${bookingId}.txt`);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        } catch (unlinkErr) {
+            console.error('Failed to delete guarantee card text file:', unlinkErr.message);
         }
 
         res.json({ success: true, message: 'Réservation supprimée.' });
