@@ -94,8 +94,11 @@ try {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Serve compiled static assets from dist
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'public')));
+console.log("test deployment is this working")
+// Set EJS view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Utility helper to parse cookies manually
 function parseCookies(cookieHeader) {
@@ -194,16 +197,11 @@ app.get('/health', (req, res) => {
 
 // Client Homepage
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    res.render('index');
 });
 
-// Admin Page
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'admin.html'));
-});
-
-// Admin Status JSON API
-app.get('/api/admin/status', async (req, res) => {
+// Admin Panel (GET)
+app.get('/admin', async (req, res) => {
     const cookies = parseCookies(req.headers.cookie);
     const loggedIn = cookies.admin_logged === 'true';
 
@@ -228,8 +226,9 @@ app.get('/api/admin/status', async (req, res) => {
             totalRevenue += b.estimatedRevenue;
         });
 
-        res.json({
+        res.render('admin', {
             loggedIn: true,
+            error: null,
             bookings: bookings.reverse(), // Sort newest first
             stats: {
                 total: bookings.length,
@@ -240,12 +239,15 @@ app.get('/api/admin/status', async (req, res) => {
             }
         });
     } else {
-        res.json({ loggedIn: false });
+        res.render('admin', {
+            loggedIn: false,
+            error: null
+        });
     }
 });
 
-// Admin Login JSON API
-app.post('/api/admin/login', (req, res) => {
+// Admin Login (POST)
+app.post('/admin', (req, res) => {
     const { password } = req.body;
 
     if (password === SECRET_PASSWORD) {
@@ -253,16 +255,19 @@ app.post('/api/admin/login', (req, res) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000 // 1 day expiration
         });
-        res.json({ success: true });
+        res.redirect('/admin');
     } else {
-        res.status(401).json({ success: false, error: 'Mot de passe incorrect.' });
+        res.render('admin', {
+            loggedIn: false,
+            error: 'Mot de passe incorrect.'
+        });
     }
 });
 
-// Admin Logout JSON API
-app.post('/api/admin/logout', (req, res) => {
+// Admin Logout (POST)
+app.post('/admin/logout', (req, res) => {
     res.clearCookie('admin_logged');
-    res.json({ success: true });
+    res.redirect('/admin');
 });
 
 // ==================== API ENDPOINTS ====================

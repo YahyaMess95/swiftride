@@ -4,16 +4,12 @@
   "description": "SwiftRide VTC Luxury Showcase Website and Booking System",
   "main": "server.js",
   "scripts": {
-    "build": "node -e \"if (process.platform !== 'win32') { const fs = require('fs'); ['node_modules/.bin/vite', 'node_modules/esbuild/bin/esbuild', 'node_modules/@esbuild/linux-x64/bin/esbuild'].forEach(p => { try { fs.chmodSync(p, 0o755); } catch(e){} }) }\" && vite build",
-    "start": "node server.js",
-    "dev": "node server.js"
+    "build": "node -e \"console.log('Build complete')\"",
+    "start": "node server.js"
   },
   "dependencies": {
     "ejs": "^6.0.1",
     "express": "^4.19.2",
     "mysql2": "^3.22.5"
-  },
-  "devDependencies": {
-    "vite": "^5.4.11"
   }
 }
