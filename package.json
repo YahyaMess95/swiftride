@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build",
     "start": "node server.js",
-    "dev": "vite"
+    "dev": "node server.js"
   },
   "dependencies": {
     "ejs": "^6.0.1",
